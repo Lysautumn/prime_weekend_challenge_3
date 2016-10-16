@@ -16,7 +16,7 @@ router.get('/', function(req, res) {
       return;
     }
 
-    client.query('SELECT * FROM pets ORDER BY owner_id', function(err, result) {
+    client.query('SELECT * FROM tasks;', function(err, result) {
       done();
       if (err) {
         console.log('Error querying the DB', err);
@@ -30,75 +30,52 @@ router.get('/', function(req, res) {
   });
 });
 
-//pets
-router.get('/', function(req, res) {
+//adding tasks
+router.post('/', function(req, res) {
   pool.connect(function(err, client, done) {
-    if(err) {
+    if (err) {
       console.log('Error connecting to DB', err);
       res.sendStatus(500);
       done();
       return;
     }
 
-    //TO DO: How to convert owner name in pets form to owner_id for pets database
-    //TO DO: Order by owner's id
-    client.query('SELECT * FROM pets LEFT JOIN owners ON owners.id = pets.owner_id;', function(err, result) {
+    client.query('INSERT INTO tasks (task, complete) VALUES ($1, $2) RETURNING *;', [req.body.task, 'false'], function(err, result) {
       done();
+      if (err) {
+        console.log('Error querying the DB', err);
+        res.sendStatus(500);
+        return;
+      }
+
+      console.log('Got rows from the DB', result.rows);
+      res.send(result.rows);
+    });
+  });
+});
+
+router.put('/:id', function(req, res) {
+  var id = req.params.id;
+  var complete = req.body.complete;
+
+  pool.connect(function(err, client, done) {
+    try {
       if(err) {
-        console.log('Error querying the DB', err);
+        console.log('Error querying to the DB', err);
         res.sendStatus(500);
         return;
       }
-      console.log('Got rows from the DB:', result.rows);
-      res.send(result.rows);
-    });
-  });
-});
-
-//adding owner info
-router.post('/', function(req, res) {
-  pool.connect(function(err, client, done) {
-    if (err) {
-      console.log('Error connecting to DB', err);
-      res.sendStatus(500);
+      client.query('UPDATE tasks SET complete="true" WHERE id=$1 RETURNING *;', function(err, result) {
+        if(err) {
+          console.log('Error querying DB', err);
+          res.sendStatus(500);
+        } else {
+          res.send(result.rows);
+        }
+      });
+    } finally {
       done();
-      return;
     }
-
-    client.query('INSERT INTO pets (name, breed, color) VALUES ($1, $2, $3) RETURNING *;', [req.body.petName, req.body.breed, req.body.color], function(err, result) {
-      done();
-      if (err) {
-        console.log('Error querying the DB', err);
-        res.sendStatus(500);
-        return;
-      }
-
-      console.log('Got rows from the DB', result.rows);
-      res.send(result.rows);
-    });
-  });
-});
-
-router.post('/', function(req, res) {
-  pool.connect(function(err, client, done) {
-    if (err) {
-      console.log('Error connecting to DB', err);
-      res.sendStatus(500);
-      done();
-      return;
-    }
-
-    client.query('INSERT INTO pets (name, breed, color) VALUES ($1, $2, $3) RETURNING *;', [req.body.petName, req.body.breed, req.body.color], function(err, result) {
-      done();
-      if (err) {
-        console.log('Error querying the DB', err);
-        res.sendStatus(500);
-        return;
-      }
-
-      console.log('Got rows from the DB', result.rows);
-      res.send(result.rows);
-    });
   });
 });
 
@@ -109,12 +86,12 @@ router.delete('/:id', function(req, res) {
   pool.connect(function(err, client, done) {
     try {
       if (err) {
-        console.log("Error connecting to DB", err);
+        console.log('Error connecting to DB', err);
         res.sendStatus(500);
         return;
       }//end of if
 
-      client.query('DELETE FROM pets WHERE id = $1;', [id], function(err){
+      client.query('DELETE FROM tasks WHERE id = $1;', [id], function(err) {
         if(err) {
           console.log('Error query the DB', err);
           res.sendStatus(500);
