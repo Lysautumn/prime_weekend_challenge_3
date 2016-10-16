@@ -16,7 +16,7 @@ router.get('/', function(req, res) {
       return;
     }
 
-    client.query('SELECT * FROM tasks;', function(err, result) {
+    client.query('SELECT * FROM tasks ORDER BY complete, LOWER(task);', function(err, result) {
       done();
       if (err) {
         console.log('Error querying the DB', err);
@@ -65,7 +65,13 @@ router.put('/:id', function(req, res) {
         res.sendStatus(500);
         return;
       }
-      client.query('UPDATE tasks SET complete="true" WHERE id=$1 RETURNING *;', function(err, result) {
+      if (complete == 'true') {
+        complete = false;
+      } else {
+        complete = true;
+      }
+
+      client.query('UPDATE tasks SET complete=$1 WHERE id=$2;', [complete, id], function(err, result) {
         if(err) {
           console.log('Error querying DB', err);
           res.sendStatus(500);
@@ -81,7 +87,7 @@ router.put('/:id', function(req, res) {
 
 router.delete('/:id', function(req, res) {
 
-  var id = req.parms.id;
+  var id = req.params.id;
 
   pool.connect(function(err, client, done) {
     try {
