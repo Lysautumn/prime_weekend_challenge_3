@@ -26,3 +26,69 @@ body {
   border-radius: 25px;
   padding: 0 25px 10px 25px;
 }
+#taskList {
+  padding-top: 25px;
+}
+.taskDesc {
+  margin-right: 10px;
+  font-size: 18px;
+}
+#taskTitle {
+  margin-right: 20px;
+  font-size: 25px;
+  font-weight: bold;
+}
+.true {
+  text-decoration: line-through;
+  color: gray;
+}
+
+/* input */
+input {
+  width: 50%;
+  height: 25px;
+  font-size: 20px;
+}
+
+/* buttons */
+button {
+  margin: 5px;
+}
+.action {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px black solid;
+}
+#addButton {
+  width: 70px;
+  height: 50px;
+  background-color: #162F3F;
+  color: white;
+  font-size: 18px;
+  border-radius: 5px;
+  border: 2px black solid;
+}
+#addButton:hover {
+  background-color: RosyBrown;
+  color: black;
+  font-weight: bold;
+}
+.complete {
+  background-color: #162F3F;
+  color: white;
+}
+.complete:hover {
+  background-color: #078C03;
+  color: white;
+}
+.delete {
+  background-color: #162F3F;
+  color: white;
+}
+.delete:hover {
+  background-color: #960000;
+  color: white;
+}

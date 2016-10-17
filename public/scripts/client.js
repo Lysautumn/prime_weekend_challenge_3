@@ -9,7 +9,6 @@ $(function() {
 });
 
 function getTasks() {
-  console.log('getTasks');
   $.ajax({
     type: 'GET',
     url: '/todo',
@@ -18,21 +17,21 @@ function getTasks() {
 };
 
 function appendTasks(response) {
-  console.log('append tasks');
   var $tasks = $('#taskList');
   $tasks.empty();
   response.forEach(function(task) {
     var $div = $('<div></div>');
-    $div.append('<p>' + task.task + '</p>');
+    var complete = task.complete;
+    $div.append('<p class="taskDesc ' + task.complete + '">' + task.task + '</p>');
     $div.data('complete', task.complete);
 
     // make a completed button and store the id data on it
-    var $completeButton = $('<button class="complete">Done</button>');
+    var $completeButton = $('<button class="action complete">&#x2713;</button>');
     $completeButton.data('id', task.id);
     $div.append($completeButton);
 
     // make a delete button
-    var $deleteButton = $('<button class="delete">X</button>');
+    var $deleteButton = $('<button class="action delete">X</button>');
     $deleteButton.data('id', task.id);
     $div.append($deleteButton);
 
@@ -43,7 +42,6 @@ function appendTasks(response) {
 function addTask(event) {
   event.preventDefault();
   var taskData = $(this).serialize();
-  console.log('taskData:', taskData);
   $.ajax({
     type: 'POST',
     url: '/todo',
@@ -68,10 +66,15 @@ function completeTask(event) {
 
 function deleteTask(event) {
   event.preventDefault();
-  var $taskId = $(this).data('id');
-  $.ajax({
-    type: 'DELETE',
-    url: '/todo/' + $taskId,
-    success: getTasks
-  });
+  var checkstr =  confirm('Are you sure you want to delete this task?');
+  if(checkstr == true) {
+    var $taskId = $(this).data('id');
+    $.ajax({
+        type: 'DELETE',
+        url: '/todo/' + $taskId,
+        success: getTasks
+      });
+  } else {
+    return false;
+  }
 }
