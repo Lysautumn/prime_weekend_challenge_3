@@ -7,6 +7,7 @@ var config = {
 
 var pool = new pg.Pool(config);
 
+// setting up get requests to the router
 router.get('/', function(req, res) {
   pool.connect(function(err, client, done) {
     if (err) {
@@ -15,7 +16,7 @@ router.get('/', function(req, res) {
       done();
       return;
     }
-
+    // how to handle get requests in the database
     client.query('SELECT * FROM tasks ORDER BY complete, LOWER(task);', function(err, result) {
       done();
       if (err) {
@@ -30,7 +31,7 @@ router.get('/', function(req, res) {
   });
 });
 
-//adding tasks
+// setting up post requests
 router.post('/', function(req, res) {
   pool.connect(function(err, client, done) {
     if (err) {
@@ -39,7 +40,7 @@ router.post('/', function(req, res) {
       done();
       return;
     }
-
+    // how to handle post requests in the database
     client.query('INSERT INTO tasks (task, complete) VALUES ($1, $2) RETURNING *;', [req.body.task, 'false'], function(err, result) {
       done();
       if (err) {
@@ -53,7 +54,7 @@ router.post('/', function(req, res) {
     });
   });
 });
-
+// setting up put requests
 router.put('/:id', function(req, res) {
   var id = req.params.id;
   var complete = req.body.complete;
@@ -70,7 +71,7 @@ router.put('/:id', function(req, res) {
       } else {
         complete = true;
       }
-
+      // handling put requests in the database
       client.query('UPDATE tasks SET complete=$1 WHERE id=$2;', [complete, id], function(err, result) {
         if(err) {
           console.log('Error querying DB', err);
@@ -84,7 +85,7 @@ router.put('/:id', function(req, res) {
     }
   });
 });
-
+// setting up delete requests
 router.delete('/:id', function(req, res) {
 
   var id = req.params.id;
@@ -96,7 +97,7 @@ router.delete('/:id', function(req, res) {
         res.sendStatus(500);
         return;
       }//end of if
-
+      // how to handle delete requests in the database
       client.query('DELETE FROM tasks WHERE id = $1;', [id], function(err) {
         if(err) {
           console.log('Error query the DB', err);

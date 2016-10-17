@@ -1,13 +1,17 @@
 $(function() {
   getTasks();
 
+  // when submit button is clicked
   $('.taskForm').on('submit', addTask);
 
+  // when done button is clicked
   $('#taskList').on('click', '.complete', completeTask);
 
+  // when delete button is clicked
   $('#taskList').on('click', '.delete', deleteTask);
 });
 
+//function to get tasks from the database
 function getTasks() {
   $.ajax({
     type: 'GET',
@@ -16,6 +20,7 @@ function getTasks() {
   });
 };
 
+// function to append tasks to the DOM
 function appendTasks(response) {
   var $tasks = $('#taskList');
   $tasks.empty();
@@ -39,6 +44,7 @@ function appendTasks(response) {
   });
 }
 
+// function to add a new task
 function addTask(event) {
   event.preventDefault();
   var taskData = $(this).serialize();
@@ -51,6 +57,7 @@ function addTask(event) {
   $(this).find('input').val('');
 }
 
+// function to mark a task as complete
 function completeTask(event) {
   event.preventDefault();
   var id = $(this).data('id');
@@ -64,6 +71,7 @@ function completeTask(event) {
   });
 };
 
+// function to delete a task on the DOM and in the database
 function deleteTask(event) {
   event.preventDefault();
   var checkstr =  confirm('Are you sure you want to delete this task?');
